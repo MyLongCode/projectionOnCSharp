@@ -32,8 +32,6 @@ class Category : IComparable<Category>
                 
     }
 
-    public override bool <
-
     public bool Equals(Category other)
     {
         if (this.Name == other.Name 
