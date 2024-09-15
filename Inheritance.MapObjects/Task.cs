@@ -49,25 +49,17 @@ public static class Interaction
 	public static void Make(Player player, object mapObject)
 	{
         if (mapObject is IEntity entityObj)
-        {
             if (!player.CanBeat(entityObj.Army))
 			{
                 player.Die();
                 return;
             }
-                
-        }
         
-		if (mapObject is IItem itemObj)
-		{
+		if (mapObject is IItem itemObj) 
 			itemObj.Owner = player.Id;
-		}
 
 		if (mapObject is ITreasure treasureObj)
-		{
 			player.Consume(treasureObj.Treasure);
-		}
-
 
 		return;
 	}
