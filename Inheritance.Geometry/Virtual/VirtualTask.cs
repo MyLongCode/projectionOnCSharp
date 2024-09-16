@@ -31,7 +31,6 @@ public class Ball : Body
         var vector = point - Position;
         var length2 = vector.GetLength2();
         return length2 <= Radius * Radius;
-        
     }
 
 	public override RectangularCuboid GetBoundingBox()
@@ -85,6 +84,7 @@ public class Cylinder : Body
 		SizeZ = sizeZ;
 		Radius = radius;
 	}
+
     public override bool ContainsPoint(Vector3 point)
     {
         var vectorX = point.X - Position.X;
@@ -110,6 +110,7 @@ public class CompoundBody : Body
 	{
 		Parts = parts;
 	}
+
     public override bool ContainsPoint(Vector3 point)
     {
         return Parts.Any(body => body.ContainsPoint(point));
@@ -125,8 +126,6 @@ public class CompoundBody : Body
 
         var maxZ = Parts.Max(p => p.GetBoundingBox().Position.Z + p.GetBoundingBox().SizeZ / 2);
         var minZ = Parts.Min(p => p.GetBoundingBox().Position.Z - p.GetBoundingBox().SizeZ / 2);
-
-				
 
         var sizeX = maxX - minX;
         var sizeY = maxY - minY;
