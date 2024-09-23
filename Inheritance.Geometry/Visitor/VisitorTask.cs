@@ -141,15 +141,17 @@ public class BoxifyVisitor : IVisitor
 
 	public Body Visit(Cylinder cylinder)
 	{
-		return cylinder.Accept(this);
-	}
+        var diameter = cylinder.Radius * 2;
+        return new RectangularCuboid(cylinder.Position, diameter, diameter, cylinder.SizeZ);
+    }
 	public Body Visit(Ball ball)
 	{
-        return ball.Accept(this);
+        double side = ball.Radius * 2;
+        return new RectangularCuboid(ball.Position, side, side, side);
     }
 
 	public Body Visit(RectangularCuboid rectangularCuboid)
 	{
-        return rectangularCuboid.Accept(this);
+        return rectangularCuboid;
     }
 }
