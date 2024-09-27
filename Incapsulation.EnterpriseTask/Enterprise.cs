@@ -29,14 +29,12 @@ namespace Incapsulation.EnterpriseTask
 
         public DateTime EstablishDate { get; set; }
 
-        public TimeSpan ActiveTimeSpan { get { return DateTime.Now - establishDate; } }
+        public TimeSpan ActiveTimeSpan => DateTime.Now - establishDate;
 
         public double GetTotalTransactionsAmount()
         {
             DataBase.OpenConnection();
-            var amount = 0.0;
-            foreach (Transaction t in DataBase.Transactions().Where(z => z.EnterpriseGuid == Guid))
-                amount += t.Amount;
+            var amount = DataBase.Transactions().Where(z => z.EnterpriseGuid == Guid).Sum(a => a.Amount);
             return amount;
         }
     }
