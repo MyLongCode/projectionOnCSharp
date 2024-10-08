@@ -1,49 +1,56 @@
 namespace Generics.Robots;
 
-public abstract class RobotAI
+public interface IRobotAI<out T> 
+	where T : IMoveCommand
 {
-	public abstract object GetCommand();
+	T GetCommand();
 }
 
-public class ShooterAI : RobotAI
+public abstract class RobotAI<T> : IRobotAI<T>
+        where T : IMoveCommand
+{
+    protected int counter = 1;
+
+    public abstract T GetCommand();
+}
+
+public class ShooterAI : RobotAI<ShooterCommand>
 {
 	int counter = 1;
 
-	public override object GetCommand()
-	{
-		return ShooterCommand.ForCounter(counter++);
-	}
+    public override ShooterCommand GetCommand() => ShooterCommand.ForCounter(counter++);
 }
 
-public class BuilderAI : RobotAI
+public class BuilderAI : RobotAI<BuilderCommand>
 {
-	int counter = 1;
-
-	public override object GetCommand()
-	{
-		return BuilderCommand.ForCounter(counter++);
-	}
+    public override BuilderCommand GetCommand() => BuilderCommand.ForCounter(counter++);
 }
 
-public abstract class Device
+public interface IDevice <in T> 
+	where T : IMoveCommand
 {
-	public abstract string ExecuteCommand(object command);
+	string ExecuteCommand(T command);
 }
 
-public class Mover : Device
+public abstract class Device<T> : IDevice<T> 
+	where T : IMoveCommand
 {
-	public override string ExecuteCommand(object _command)
-	{
-		var command = _command as IMoveCommand;
-		if (command == null)
-			throw new ArgumentException();
-		return $"MOV {command.Destination.X}, {command.Destination.Y}";
-	}
+    public abstract string ExecuteCommand(T command);
 }
 
-public class ShooterMover : Device
+public class Mover : Device<IMoveCommand>
 {
-	public override string ExecuteCommand(object _command)
+    public override string ExecuteCommand(IMoveCommand command)
+    {
+        if (command == null)
+            throw new ArgumentException();
+        return $"MOV {command.Destination.X}, {command.Destination.Y}";
+    }
+}
+
+public class ShooterMover : Device<IMoveCommand>
+{
+	public override string ExecuteCommand(IMoveCommand _command)
 	{
 		var command = _command as IShooterMoveCommand;
 		if (command == null)
@@ -55,10 +62,10 @@ public class ShooterMover : Device
 
 public class Robot
 {
-	private readonly RobotAI ai;
-	private readonly Device device;
+	private readonly IRobotAI<IMoveCommand> ai;
+    private readonly IDevice<IMoveCommand> device;
 
-	public Robot(RobotAI ai, Device executor)
+	public Robot(IRobotAI<IMoveCommand> ai, IDevice<IMoveCommand> executor)
 	{
 		this.ai = ai;
 		this.device = executor;
@@ -75,7 +82,7 @@ public class Robot
 		}
 	}
 
-	public static Robot Create<TCommand>(RobotAI ai, Device executor)
+	public static Robot Create<TCommand>(IRobotAI<IMoveCommand> ai, IDevice<IMoveCommand> executor)
 	{
 		return new Robot(ai, executor);
 	}
