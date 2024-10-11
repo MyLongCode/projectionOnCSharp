@@ -60,30 +60,33 @@ public class ShooterMover : Device<IMoveCommand>
 	}
 }
 
-public class Robot
+public class Robot<T> where T : IMoveCommand
 {
-	private readonly IRobotAI<IMoveCommand> ai;
-    private readonly IDevice<IMoveCommand> device;
+    IRobotAI<T> ai;
+    IDevice<T> device;
 
-	public Robot(IRobotAI<IMoveCommand> ai, IDevice<IMoveCommand> executor)
-	{
-		this.ai = ai;
-		this.device = executor;
-	}
+    public Robot(IRobotAI<T> ai, IDevice<T> executor)
+    {
+        this.ai = ai;
+        this.device = executor;
+    }
 
-	public IEnumerable<string> Start(int steps)
-	{
-		for (int i = 0; i < steps; i++)
-		{
-			var command = ai.GetCommand();
-			if (command == null)
-				break;
-			yield return device.ExecuteCommand(command);
-		}
-	}
+    public IEnumerable<string> Start(int steps)
+    {
+        for (int i = 0; i < steps; i++)
+        {
+            var command = ai.GetCommand();
+            if (command == null)
+                break;
+            yield return device.ExecuteCommand(command);
+        }
+    }
+}
 
-	public static Robot Create<TCommand>(IRobotAI<IMoveCommand> ai, IDevice<IMoveCommand> executor)
-	{
-		return new Robot(ai, executor);
-	}
+public static class Robot
+{
+    public static Robot<IMoveCommand> Create<T>(IRobotAI<IMoveCommand> ai, IDevice<IMoveCommand> device)
+    {
+        return new Robot<IMoveCommand>(ai, device);
+    }
 }
