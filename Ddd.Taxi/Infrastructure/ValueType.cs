@@ -6,14 +6,14 @@ namespace Ddd.Taxi.Infrastructure;
 
 public class ValueType<T>
 {
-    private readonly List<PropertyInfo> orderedProperties;
+    private readonly List<PropertyInfo> properties;
 
     public ValueType()
     {
-        this.orderedProperties = this.GetType()
-                                     .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                                     .OrderBy(p => p.Name)
-                                     .ToList();
+        properties = this.GetType()
+                          .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                          .OrderBy(p => p.Name)
+                          .ToList();
     }
 
     public override bool Equals(object obj)
@@ -21,7 +21,7 @@ public class ValueType<T>
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        foreach (var property in orderedProperties)
+        foreach (var property in properties)
         {
             var thisValue = property.GetValue(this, null);
             var objectValue = property.GetValue(obj, null);
@@ -33,13 +33,9 @@ public class ValueType<T>
 
     public override int GetHashCode()
     {
-        int hash = 0;
-        foreach (var property in orderedProperties)
-        {
-            var propertyHash = property.GetValue(this, null).GetHashCode();
-            hash = (hash * 1248188) ^ propertyHash;
-        }
-
+        int hash = 17;
+        foreach (var property in properties)
+            hash = (hash * 1248188) ^ property.GetValue(this, null).GetHashCode();
         return hash;
     }
 
@@ -49,9 +45,9 @@ public class ValueType<T>
     {
         var result = new StringBuilder(this.GetType().Name + "(");
         int index = 0;
-        foreach (var property in orderedProperties)
+        foreach (var property in properties)
         {
-            if (index != orderedProperties.Count - 1)
+            if (index != properties.Count - 1)
                 result.AppendFormat("{0}: {1}; ", property.Name, property.GetValue(this, null));
             else
                 result.AppendFormat("{0}: {1})", property.Name, property.GetValue(this, null));
